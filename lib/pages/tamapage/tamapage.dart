@@ -37,83 +37,7 @@ class _TamaPageBodyState extends State<_TamaPageBody> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Column(
-              children: <Widget>[
-                Container(
-                    constraints: BoxConstraints(minWidth: 130, maxWidth: 130),
-                    margin: EdgeInsets.only(left: 20),
-                    child: Row(
-                      children: <Widget>[
-                        Icon(Icons.favorite),
-                        Container(
-                            margin: EdgeInsets.only(left: 6),
-                            constraints: BoxConstraints(maxWidth: 100),
-                            child: LinearProgressIndicator(
-                              value: _currentLife,
-                              backgroundColor: Colors.red,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.green),
-                            ))
-                      ],
-                    )),
-                Container(
-                    constraints: BoxConstraints(minWidth: 130, maxWidth: 130),
-                    margin: EdgeInsets.only(left: 20),
-                    child: Row(
-                      children: <Widget>[
-                        Icon(Icons.fastfood),
-                        Container(
-                            margin: EdgeInsets.only(left: 6),
-                            constraints: BoxConstraints(maxWidth: 100),
-                            child: LinearProgressIndicator(
-                              value: _currentFood,
-                              backgroundColor: Colors.red,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.green),
-                            ))
-                      ],
-                    )),
-                Container(
-                    constraints: BoxConstraints(minWidth: 130, maxWidth: 130),
-                    margin: EdgeInsets.only(left: 20),
-                    child: Row(
-                      children: <Widget>[
-                        Icon(Icons.child_care),
-                        Container(
-                            margin: EdgeInsets.only(left: 6),
-                            constraints: BoxConstraints(maxWidth: 100),
-                            child: LinearProgressIndicator(
-                              value: _currentHappy,
-                              backgroundColor: Colors.red,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.green),
-                            ))
-                      ],
-                    )),
-                Container(
-                    constraints: BoxConstraints(minWidth: 130, maxWidth: 130),
-                    margin: EdgeInsets.only(left: 20),
-                    child: Row(
-                      children: <Widget>[
-                        Icon(Icons.airline_seat_individual_suite),
-                        Container(
-                            margin: EdgeInsets.only(left: 6),
-                            constraints: BoxConstraints(maxWidth: 100),
-                            child: LinearProgressIndicator(
-                              value: _currentSleep,
-                              backgroundColor: Colors.red,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.green),
-                            ))
-                      ],
-                    )),
-              ],
-            )
-          ],
-        ),
+        buildStatusBar(),
         Padding(
             padding: EdgeInsets.only(bottom: 20, top: 10),
             child: Stack(
@@ -154,6 +78,86 @@ class _TamaPageBodyState extends State<_TamaPageBody> {
     _timer.cancel();
   }
 
+  Row buildStatusBar() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: <Widget>[
+        Column(
+          children: <Widget>[
+            Container(
+                constraints: BoxConstraints(minWidth: 130, maxWidth: 130),
+                margin: EdgeInsets.only(left: 20),
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.favorite),
+                    Container(
+                        margin: EdgeInsets.only(left: 6),
+                        constraints: BoxConstraints(maxWidth: 100),
+                        child: LinearProgressIndicator(
+                          value: _currentLife,
+                          backgroundColor: Colors.red,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.green),
+                        ))
+                  ],
+                )),
+            Container(
+                constraints: BoxConstraints(minWidth: 130, maxWidth: 130),
+                margin: EdgeInsets.only(left: 20),
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.fastfood),
+                    Container(
+                        margin: EdgeInsets.only(left: 6),
+                        constraints: BoxConstraints(maxWidth: 100),
+                        child: LinearProgressIndicator(
+                          value: _currentFood,
+                          backgroundColor: Colors.red,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.green),
+                        ))
+                  ],
+                )),
+            Container(
+                constraints: BoxConstraints(minWidth: 130, maxWidth: 130),
+                margin: EdgeInsets.only(left: 20),
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.child_care),
+                    Container(
+                        margin: EdgeInsets.only(left: 6),
+                        constraints: BoxConstraints(maxWidth: 100),
+                        child: LinearProgressIndicator(
+                          value: _currentHappy,
+                          backgroundColor: Colors.red,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.green),
+                        ))
+                  ],
+                )),
+            Container(
+                constraints: BoxConstraints(minWidth: 130, maxWidth: 130),
+                margin: EdgeInsets.only(left: 20),
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.airline_seat_individual_suite),
+                    Container(
+                        margin: EdgeInsets.only(left: 6),
+                        constraints: BoxConstraints(maxWidth: 100),
+                        child: LinearProgressIndicator(
+                          value: _currentSleep,
+                          backgroundColor: Colors.red,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.green),
+                        ))
+                  ],
+                )),
+          ],
+        )
+      ],
+    );
+  }
+
   List<Widget> buttons() {
     return [
       Stack(alignment: AlignmentDirectional.center, children: [
@@ -189,26 +193,6 @@ class _TamaPageBodyState extends State<_TamaPageBody> {
         ),
         Icon(Icons.android, size: 40)
       ])
-    ];
-  }
-
-  List<Widget> statusBar() {
-    return [
-      LinearProgressIndicator(
-        value: 0.5,
-        backgroundColor: Colors.transparent,
-        valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-      ),
-      LinearProgressIndicator(
-        value: 0.5,
-        backgroundColor: Colors.transparent,
-        valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-      ),
-      LinearProgressIndicator(
-        value: 0.5,
-        backgroundColor: Colors.transparent,
-        valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-      ),
     ];
   }
 }
