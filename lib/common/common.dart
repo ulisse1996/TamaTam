@@ -24,27 +24,23 @@ class LoadingStateView extends StatelessWidget {
 }
 
 abstract class BasePageWidget extends StatelessWidget {
-  final bool _logged;
   final _title = Padding(
       padding: EdgeInsets.only(top: 10),
       child: Text("TamaTama",
           style: TextStyle(fontFamily: "Mango Drink", fontSize: 60)));
-
-  BasePageWidget(this._logged);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBar(context),
       body: body(),
-      persistentFooterButtons: footer(),
     );
   }
 
   Widget body();
 
   Widget appBar(BuildContext context) {
-    if (this._logged) {
+    if (checkLogged()) {
       // User Info
       return AppBar(
           title: _title,
@@ -73,47 +69,6 @@ abstract class BasePageWidget extends StatelessWidget {
           elevation: 0);
     }
   }
-
-  List<Widget> footer() {
-    return [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          RaisedButton(
-            onPressed: () {},
-            child: Text("Button"),
-          ),
-          RaisedButton(
-            onPressed: () {},
-            child: Text("Button"),
-          ),
-          RaisedButton(
-            onPressed: () {},
-            child: Text("Button"),
-          ),
-        ],
-      ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          RaisedButton(
-            onPressed: () {},
-            child: Text("Button"),
-          ),
-          RaisedButton(
-            onPressed: () {},
-            child: Text("Button"),
-          ),
-          RaisedButton(
-            onPressed: () {},
-            child: Text("Button"),
-          ),
-        ],
-      ),
-    ];
-  }
-
-  isLogged() => _logged;
 }
 
 String passwordValidator(String value, String title) {

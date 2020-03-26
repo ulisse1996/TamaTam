@@ -2,26 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/widgets.dart';
 
-import '../common/common.dart';
-import '../service/auth-service.dart';
+import '../../common/common.dart';
+import '../../service/auth-service.dart';
 
 class HomePage extends BasePageWidget {
-  HomePage(bool logged) : super(logged);
 
   @override
   Widget body() {
-    if (isLogged()) {
-      return Center(
-        child: Text("Logged"),
-      );
-    } else {
       return LoginRegisterForm();
-    }
-  }
-
-  @override
-  List<Widget> footer() {
-    return [];
   }
 }
 

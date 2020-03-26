@@ -6,7 +6,7 @@ import 'package:flutter/src/widgets/framework.dart';
 
 import '../common/common.dart';
 import '../repository/tama-repository.dart';
-import '../homepage/homepage.dart';
+import '../pages/tamapage/tamapage.dart';
 import '../model/user-info.dart' as model;
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -30,7 +30,7 @@ class AuthService {
       saveUser(userInfo.toJson());
       Navigator.push(
         currentContext,
-        MaterialPageRoute(builder: (context) => HomePage(true)),
+        MaterialPageRoute(builder: (context) => TamaPage()),
       );
     } catch (error) {
       print(error);
@@ -85,7 +85,7 @@ class AuthService {
       saveUser(userInfo.toJson());
       Navigator.push(
         currentContext,
-        MaterialPageRoute(builder: (context) => HomePage(true)),
+        MaterialPageRoute(builder: (context) => TamaPage()),
       );
     } catch(error) {
       print(error);

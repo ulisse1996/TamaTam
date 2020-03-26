@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'common/common.dart';
-import 'homepage/homepage.dart';
+import 'pages/homepage/homepage.dart';
+import 'pages/tamapage/tamapage.dart';
 
 void main() => runApp(MyApp());
 
@@ -14,8 +15,10 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.orange,
         primaryColor: Colors.orange
       ),
-      home: HomePage(checkLogged()),
+      home: checkLogin(),
     );
   }
+
+  Widget checkLogin() => checkLogged() ? TamaPage() : HomePage();
 }
 
