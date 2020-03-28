@@ -38,8 +38,8 @@ class AuthService {
       } else {
         print('Found Tama : $tama');
       }
-      saveUser(userInfo.toJson());
-      saveTama(tama.toJson());
+      await saveUser(userInfo.toJson());
+      await saveTama(tama.toJson());
       Navigator.push<TamaPage>(
         currentContext,
         MaterialPageRoute<TamaPage>(builder: (BuildContext context) => TamaPage()),

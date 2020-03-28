@@ -28,7 +28,7 @@ class Tama {
   factory Tama.empty(String uuid) => Tama(uuid, randomType(), Decimal.one, Decimal.one,Decimal.one,Decimal.one, DateTime.now());
 
   static TamaType randomType() {
-    return TamaType.values[Random().nextInt(TamaType.values.length - 1)];
+    return TamaType.values[Random().nextInt(TamaType.values.length)];
   }
 
   String tamaId;

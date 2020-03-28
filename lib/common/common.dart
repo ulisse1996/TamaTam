@@ -101,11 +101,11 @@ bool checkLogged() {
   return values != null && values.isNotEmpty;
 }
 
-void saveUser(Map<String, dynamic> info) {
+Future<void> saveUser(Map<String, dynamic> info) async {
   _localStorage.setItem(USER_INFO, info);
 }
 
-void saveTama(Map<String, dynamic> info) {
+Future<void> saveTama(Map<String, dynamic> info) async {
   _localStorage.setItem(TAMA, info);
 }
 
