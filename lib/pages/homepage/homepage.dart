@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../common/common.dart';
@@ -14,9 +13,9 @@ class HomePage extends BasePageWidget {
 }
 
 class LoginRegisterForm extends StatelessWidget {
-  final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -27,26 +26,26 @@ class LoginRegisterForm extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.only(left: 30, right: 30),
+              padding: const EdgeInsets.only(left: 30, right: 30),
               child: TextFormField(
                 controller: _emailController,
                 decoration: const InputDecoration(
-                  labelText: "Email",
+                  labelText: 'Email',
                   hintText: 'Enter your email',
                 ),
-                validator: (value) => emailValidator(value, EMAIL),
+                validator: (String value) => emailValidator(value, EMAIL),
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(left: 30, right: 30),
+              padding: const EdgeInsets.only(left: 30, right: 30),
               child: TextFormField(
                 obscureText: true,
                 controller: _passwordController,
                 decoration: const InputDecoration(
-                  labelText: "Password",
+                  labelText: 'Password',
                   hintText: 'Enter your password',
                 ),
-                validator: (value) => passwordValidator(value, PASSWORD),
+                validator: (String value) => passwordValidator(value, PASSWORD),
               ),
             ),
             ButtonBar(
@@ -58,7 +57,7 @@ class LoginRegisterForm extends StatelessWidget {
                       processLogin();
                     }
                   },
-                  child: Text('Login'),
+                  child: const Text('Login'),
                 ),
                 RaisedButton(
                   onPressed: () {
@@ -66,7 +65,7 @@ class LoginRegisterForm extends StatelessWidget {
                       processRegister();
                     }
                   },
-                  child: Text('Register'),
+                  child: const Text('Register'),
                 )
               ],
             ),
@@ -75,13 +74,13 @@ class LoginRegisterForm extends StatelessWidget {
     );
   }
 
-  void processLogin() async {
+  Future<void> processLogin() async {
     showLoading(_formKey.currentContext);
     AuthService.processLogin(_formKey.currentContext,
       _emailController, _passwordController);
   }
 
-  void processRegister() async {
+  Future<void> processRegister() async {
     showLoading(_formKey.currentContext);
     AuthService.processRegister(_formKey.currentContext,
       _emailController, _passwordController);

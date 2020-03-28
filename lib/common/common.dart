@@ -1,38 +1,39 @@
+import 'dart:math' as math;
+
 import 'package:decimal/decimal.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'dart:math' as math;
 
 import '../main.dart';
 import '../model/tama.dart';
 import '../service/tama-service.dart';
 
-const USER_INFO = "userInfo";
-const TAMA = "tama";
-const DATA_FILE = "dataUser.json";
-const PASSWORD = "Password";
-const EMAIL = "Email";
-const EMAIL_REGEX =
+const String USER_INFO = 'userInfo';
+const String TAMA = 'tama';
+const String DATA_FILE = 'dataUser.json';
+const String PASSWORD = 'Password';
+const String EMAIL = 'Email';
+const String EMAIL_REGEX =
     r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
 final LocalStorage _localStorage = LocalStorage(DATA_FILE);
 
 class LoadingStateView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(child: Text("Loaind")),
+    return const Scaffold(
+      body: Center(child: Text('Loaind')),
     );
   }
 }
 
 abstract class BasePageWidget extends StatelessWidget {
-  final _title = Padding(
+  final Padding _title = const Padding(
       padding: EdgeInsets.only(top: 10),
-      child: Text("TamaTama",
-          style: TextStyle(fontFamily: "Mango Drink", fontSize: 60)));
+      child: Text('TamaTama',
+          style:  TextStyle(fontFamily: 'Mango Drink', fontSize: 60)));
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +97,7 @@ String emailValidator(String value, String title) {
 }
 
 bool checkLogged() {
-  Map<String, dynamic> values = getUserInfo();
+  final Map<String, dynamic> values = getUserInfo();
   return values != null && values.isNotEmpty;
 }
 
@@ -109,12 +110,12 @@ void saveTama(Map<String, dynamic> info) {
 }
 
 Map<String, dynamic> getTama() {
-  Map<String, dynamic> values = _localStorage.getItem(TAMA) as Map<String, dynamic>;
+  final Map<String, dynamic> values = _localStorage.getItem(TAMA) as Map<String, dynamic>;
   return values;
 }
 
 Map<String, dynamic> getUserInfo() {
-  Map<String, dynamic> values = _localStorage.getItem(USER_INFO) as Map<String, dynamic>;
+  final Map<String, dynamic> values = _localStorage.getItem(USER_INFO) as Map<String, dynamic>;
   return values;
 }
 
@@ -152,7 +153,7 @@ class TamaUtil {
   static List<String> getImages(TamaType tamaType) {
     final String name = describeEnum(tamaType).toLowerCase();
     final String camel = _camelCase(describeEnum(tamaType));
-    return List<String>.of([
+    return List<String>.of(<String>[
       _append('assets/animals/$name/$camel','_Down.png'),
       _append('assets/animals/$name/$camel','_Left.png'),
       _append('assets/animals/$name/$camel','_Right.png'),
@@ -194,7 +195,7 @@ class TamaUtil {
   }
 
   static Map<EmotionType, String> getEmotions() {
-    final Map<EmotionType,String> vals = {};
+    final Map<EmotionType,String> vals = <EmotionType,String>{};
     for (final EmotionType em in EmotionType.values) {
       final String camel = _camelCase(describeEnum(em));
       vals[em] = 'assets/emotions/Status_$camel.png';

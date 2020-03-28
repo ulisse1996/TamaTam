@@ -16,7 +16,7 @@ class TamaPage extends BasePageWidget {
   Widget body() {
     return MultiBlocProvider(
       child: _TamaPageBody(),
-      providers: [
+      providers: <BlocProvider<dynamic>>[
         BlocProvider<TamaLifeBloc>(
           create: (BuildContext context) => TamaLifeBloc(),
         ),
@@ -63,16 +63,16 @@ class _TamaPageBodyState extends State<_TamaPageBody> {
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: [
+      children: <Widget>[
         buildStatusBar(lifeBloc, foodBloc, happyBloc, sleepBloc),
         buildTama(imageBloc, emotionBloc),
         Padding(
-            padding: EdgeInsets.only(bottom: 20, top: 40),
+            padding: const EdgeInsets.only(bottom: 20, top: 40),
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: buttons())),
         Padding(
-            padding: EdgeInsets.only(bottom: 20, top: 20),
+            padding: const EdgeInsets.only(bottom: 20, top: 20),
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: buttons()))
@@ -83,19 +83,19 @@ class _TamaPageBodyState extends State<_TamaPageBody> {
   Padding buildTama(TamaImageBloc imageBloc, TamaEmotionBloc emotionBloc) {
         initImageTimer(imageBloc);
         return Padding(
-            padding: EdgeInsets.only(bottom: 20, top: 10),
+            padding: const EdgeInsets.only(bottom: 20, top: 10),
             child: Stack(
               children: <Widget>[
                 BlocBuilder<TamaImageBloc, String>(
-                  builder: (context, val) {
+                  builder: (BuildContext context, String val) {
                     return Image(image: AssetImage(val));
                   },
                   bloc: imageBloc,
                 ),
                 Container(
-                    padding: EdgeInsets.only(left: 80),
+                    padding: const EdgeInsets.only(left: 80),
                     child: BlocBuilder<TamaEmotionBloc, String>(
-                      builder: (context, val) {
+                      builder: (BuildContext context, String val) {
                         if (val.isEmpty) {
                           return const SizedBox.shrink();
                         } else {
@@ -124,16 +124,16 @@ class _TamaPageBodyState extends State<_TamaPageBody> {
                     Column(
                       children: <Widget>[
                         Container(
-                            constraints: BoxConstraints(minWidth: 130, maxWidth: 130),
-                            margin: EdgeInsets.only(left: 20),
+                            constraints: const BoxConstraints(minWidth: 130, maxWidth: 130),
+                            margin: const EdgeInsets.only(left: 20),
                             child: Row(
                               children: <Widget>[
                                 Icon(Icons.favorite),
                                 Container(
-                                    margin: EdgeInsets.only(left: 6),
-                                    constraints: BoxConstraints(maxWidth: 100),
+                                    margin: const EdgeInsets.only(left: 6),
+                                    constraints: const BoxConstraints(maxWidth: 100),
                                     child: BlocBuilder<TamaLifeBloc, Decimal>(
-                                      builder: (context, value) {
+                                      builder: (BuildContext context, Decimal value) {
                                         return LinearProgressIndicator(
                                           value: value.toDouble(),
                                           backgroundColor: Colors.red,
@@ -146,16 +146,16 @@ class _TamaPageBodyState extends State<_TamaPageBody> {
                               ],
                             )),
                         Container(
-                            constraints: BoxConstraints(minWidth: 130, maxWidth: 130),
-                            margin: EdgeInsets.only(left: 20),
+                            constraints: const BoxConstraints(minWidth: 130, maxWidth: 130),
+                            margin: const EdgeInsets.only(left: 20),
                             child: Row(
                               children: <Widget>[
                                 Icon(Icons.fastfood),
                                 Container(
-                                    margin: EdgeInsets.only(left: 6),
-                                    constraints: BoxConstraints(maxWidth: 100),
+                                    margin: const EdgeInsets.only(left: 6),
+                                    constraints: const BoxConstraints(maxWidth: 100),
                                     child: BlocBuilder<TamaFoodBloc, Decimal>(
-                                      builder: (context, value) {
+                                      builder: (BuildContext context, Decimal value) {
                                         return LinearProgressIndicator(
                                           value: value.toDouble(),
                                           backgroundColor: Colors.red,
@@ -168,16 +168,16 @@ class _TamaPageBodyState extends State<_TamaPageBody> {
                               ],
                             )),
                         Container(
-                            constraints: BoxConstraints(minWidth: 130, maxWidth: 130),
-                            margin: EdgeInsets.only(left: 20),
+                            constraints: const BoxConstraints(minWidth: 130, maxWidth: 130),
+                            margin: const EdgeInsets.only(left: 20),
                             child: Row(
                               children: <Widget>[
                                 Icon(Icons.child_care),
                                 Container(
-                                    margin: EdgeInsets.only(left: 6),
-                                    constraints: BoxConstraints(maxWidth: 100),
+                                    margin: const EdgeInsets.only(left: 6),
+                                    constraints: const BoxConstraints(maxWidth: 100),
                                     child: BlocBuilder<TamaHappyBloc, Decimal>(
-                                      builder: (context, value) {
+                                      builder: (BuildContext context, Decimal value) {
                                         return LinearProgressIndicator(
                                           value: value.toDouble(),
                                           backgroundColor: Colors.red,
@@ -190,16 +190,16 @@ class _TamaPageBodyState extends State<_TamaPageBody> {
                               ],
                             )),
                         Container(
-                            constraints: BoxConstraints(minWidth: 130, maxWidth: 130),
-                            margin: EdgeInsets.only(left: 20),
+                            constraints: const BoxConstraints(minWidth: 130, maxWidth: 130),
+                            margin: const EdgeInsets.only(left: 20),
                             child: Row(
                               children: <Widget>[
                                 Icon(Icons.airline_seat_individual_suite),
                                 Container(
-                                    margin: EdgeInsets.only(left: 6),
-                                    constraints: BoxConstraints(maxWidth: 100),
+                                    margin: const EdgeInsets.only(left: 6),
+                                    constraints: const BoxConstraints(maxWidth: 100),
                                     child: BlocBuilder<TamaSleepBloc, Decimal>(
-                                      builder: (context, value) {
+                                      builder: (BuildContext context, Decimal value) {
                                         return LinearProgressIndicator(
                                           value: value.toDouble(),
                                           backgroundColor: Colors.red,
@@ -218,8 +218,8 @@ class _TamaPageBodyState extends State<_TamaPageBody> {
               }
             
               List<Widget> buttons() {
-                return [
-                  Stack(alignment: AlignmentDirectional.center, children: [
+                return <Widget>[
+                  Stack(alignment: AlignmentDirectional.center, children: <Widget>[
                     GestureDetector(
                       onTap: () {
                       }, // handle your image tap here
@@ -231,7 +231,7 @@ class _TamaPageBodyState extends State<_TamaPageBody> {
                     ),
                     Icon(Icons.android, size: 40)
                   ]),
-                  Stack(alignment: AlignmentDirectional.center, children: [
+                  Stack(alignment: AlignmentDirectional.center, children: <Widget>[
                     GestureDetector(
                       onTap: () {}, // handle your image tap here
                       child: Image.asset(
@@ -242,7 +242,7 @@ class _TamaPageBodyState extends State<_TamaPageBody> {
                     ),
                     Icon(Icons.android, size: 40)
                   ]),
-                  Stack(alignment: AlignmentDirectional.center, children: [
+                  Stack(alignment: AlignmentDirectional.center, children: <Widget>[
                     GestureDetector(
                       onTap: () {}, // handle your image tap here
                       child: Image.asset(

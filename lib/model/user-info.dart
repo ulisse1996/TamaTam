@@ -7,10 +7,10 @@ class UserInfo {
 
   UserInfo(this.userId, this.tamaId);
 
+  factory UserInfo.fromJson(Map<String, dynamic> json) => _$UserInfoFromJson(json);
+
   String userId;
   String tamaId;
-
-  factory UserInfo.fromJson(Map<String, dynamic> json) => _$UserInfoFromJson(json);
 
   Map<String, dynamic> toJson() => _$UserInfoToJson(this);
 

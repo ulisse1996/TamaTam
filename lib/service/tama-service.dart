@@ -6,23 +6,23 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../common/common.dart';
 import '../model/tama.dart';
-import '../repository/tama-repository.dart';
+import '../repository/tama-repository.dart' as tama_repository;
 
 class TamaService {
 
   static Future<Tama> getTama(String tamaId) {
-    return TamaRepository.findTamaById(tamaId);
+    return tama_repository.findTamaById(tamaId);
   }
 
   static Future<void> saveTama(Tama tama) {
-    return TamaRepository.saveTama(tama);
+    return tama_repository.saveTama(tama);
   }
 }
 
 abstract class TamaEvent<T> {
-  final T _val;
-
   TamaEvent(this._val);
+
+  final T _val;
 
   T get val => _val;
 }

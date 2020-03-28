@@ -23,6 +23,8 @@ class Tama {
     this.life, this.food, this.happy, this.sleep,
     this.lifeTime);
 
+  factory Tama.fromJson(Map<String, dynamic> json) => _$TamaFromJson(json);
+
   factory Tama.empty(String uuid) => Tama(uuid, randomType(), Decimal.one, Decimal.one,Decimal.one,Decimal.one, DateTime.now());
 
   static TamaType randomType() {
@@ -41,8 +43,6 @@ class Tama {
   @JsonKey(fromJson: decimalDeserializer, toJson: decimalSerializer)
   Decimal sleep;
   DateTime lifeTime;
-
-  factory Tama.fromJson(Map<String, dynamic> json) => _$TamaFromJson(json);
 
   Map<String, dynamic> toJson() => _$TamaToJson(this);
 
