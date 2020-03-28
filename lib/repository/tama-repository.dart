@@ -1,28 +1,37 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../model/user-info.dart';
+import '../model/tama.dart';
 
 final Firestore _firestore = Firestore.instance;
 
 class TamaRepository {
-  static final _repoName = "tama";
+  static final _collName = "tama";
 
-  static Future<UserInfo> findUser(String userId) async {
-    QuerySnapshot val = await _firestore
-        .collection(_repoName)
-        .where("userId", isEqualTo: userId)
-        .getDocuments();
-    if (val.documents.isEmpty) {
+  static Future<Tama> findTamaById(String tamaId) async {
+    QuerySnapshot val = await _firestore.collection(_collName)
+      .where("tamaId", isEqualTo: tamaId)
+      .getDocuments();
+    if (val.documents.length == 0) {
+      print("Can't find tama");
       return null;
     } else {
-      return UserInfo.fromJson(val.documents[0].data);
+      return Tama.fromJson(val.documents[0].data);
     }
   }
 
-  static void saveUser(UserInfo userInfo) async {
-    DocumentReference ref = await _firestore.collection(_repoName)
-      .add(userInfo.toJson());
-    String docId = ref.documentID;
-    print('Add new tama with id $docId');
+  static Future<void> createTama(Tama tama) async {
+    await _firestore.collection(_collName)
+      .add(tama.toJson());
+  }
+
+  static Future<void> saveTama(Tama tama) async {
+    QuerySnapshot val = await _firestore.collection(_collName)
+      .where("tamaId", isEqualTo: tama.tamaId)
+      .getDocuments();
+    String docId = val.documents[0].documentID;
+    await _firestore.collection(_collName)
+      .document(docId)
+      .setData(tama.toJson());
   }
 }

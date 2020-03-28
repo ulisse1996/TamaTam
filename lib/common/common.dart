@@ -1,3 +1,5 @@
+import 'package:decimal/decimal.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:localstorage/localstorage.dart';
@@ -5,8 +7,11 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'dart:math' as math;
 
 import '../main.dart';
+import '../model/tama.dart';
+import '../service/tama-service.dart';
 
 const USER_INFO = "userInfo";
+const TAMA = "tama";
 const DATA_FILE = "dataUser.json";
 const PASSWORD = "Password";
 const EMAIL = "Email";
@@ -39,7 +44,7 @@ abstract class BasePageWidget extends StatelessWidget {
 
   Widget body();
 
-  Widget appBar(BuildContext context) {
+  PreferredSizeWidget appBar(BuildContext context) {
     if (checkLogged()) {
       // User Info
       return AppBar(
@@ -53,9 +58,9 @@ abstract class BasePageWidget extends StatelessWidget {
               icon: Icon(Icons.exit_to_app, color: Colors.black),
               onPressed: () async {
                 await _localStorage.deleteItem(USER_INFO);
-                Navigator.push(
+                Navigator.push<MyApp>(
                   context,
-                  MaterialPageRoute(builder: (context) => MyApp()),
+                  MaterialPageRoute<MyApp>(builder: (BuildContext context) => MyApp()),
                 );
               },
             ),
@@ -99,8 +104,17 @@ void saveUser(Map<String, dynamic> info) {
   _localStorage.setItem(USER_INFO, info);
 }
 
+void saveTama(Map<String, dynamic> info) {
+  _localStorage.setItem(TAMA, info);
+}
+
+Map<String, dynamic> getTama() {
+  Map<String, dynamic> values = _localStorage.getItem(TAMA) as Map<String, dynamic>;
+  return values;
+}
+
 Map<String, dynamic> getUserInfo() {
-  Map<String, dynamic> values = _localStorage.getItem(USER_INFO);
+  Map<String, dynamic> values = _localStorage.getItem(USER_INFO) as Map<String, dynamic>;
   return values;
 }
 
@@ -120,10 +134,86 @@ class LoadingScreen extends StatelessWidget {
 }
 
 void showLoading(BuildContext context) {
-  LoadingScreen screen = LoadingScreen();
-  Navigator.of(context).push(MaterialPageRoute(builder: (context) => screen));
+  final LoadingScreen screen = LoadingScreen();
+  Navigator.of(context).push<LoadingScreen>
+    (MaterialPageRoute<LoadingScreen>(builder: (BuildContext context) => screen));
 }
 
 void removeLoading<T>(BuildContext context, T obj) {
   Navigator.of(context).pop(obj);
+}
+
+class TamaUtil {
+
+  static String _append(String s, String s2) {
+    return s + s2;
+  }
+
+  static List<String> getImages(TamaType tamaType) {
+    final String name = describeEnum(tamaType).toLowerCase();
+    final String camel = _camelCase(describeEnum(tamaType));
+    return List<String>.of([
+      _append('assets/animals/$name/$camel','_Down.png'),
+      _append('assets/animals/$name/$camel','_Left.png'),
+      _append('assets/animals/$name/$camel','_Right.png'),
+      _append('assets/animals/$name/$camel','_Up.png')
+    ]);
+  }
+
+  static String _camelCase(String s) {
+    final String sLow = s.toLowerCase();
+    return sLow[0].toUpperCase() + sLow.substring(1);
+  }
+
+  static String getDeadImage(TamaType tamaType) {
+    final String name = describeEnum(tamaType).toLowerCase();
+    final String camel = _camelCase(describeEnum(tamaType));
+    return _append('assets/animals/$name/$camel','_Dead.png');
+  }
+
+  static String getAvatar(TamaType tamaType) {
+    final String name = describeEnum(tamaType).toLowerCase();
+    final String camel = _camelCase(describeEnum(tamaType));
+    return _append('assets/animals/$name/$camel','_Avatar_Circle.png');
+  }
+
+  static String getEggImage(TamaType tamaType) {
+    switch (tamaType) {
+      case TamaType.CAT:
+        return 'assets/eggs/egg_blue';
+      case TamaType.CHICK:
+        return 'assets/eggs/egg_yellow';
+      case TamaType.PIG:
+      case TamaType.RABBIT:
+        return 'assets/eggs/egg_pink';
+      case TamaType.FOX:
+      case TamaType.MOUSE:
+        return 'assets/eggs/egg_red';
+    }
+    return ''; //Never Happen
+  }
+
+  static Map<EmotionType, String> getEmotions() {
+    final Map<EmotionType,String> vals = {};
+    for (final EmotionType em in EmotionType.values) {
+      final String camel = _camelCase(describeEnum(em));
+      vals[em] = 'assets/emotions/Status_$camel.png';
+    }
+    return vals;
+  }
+
+  static int getImagesSize() {
+    return 4;
+  }
+}
+
+String decimalSerializer(Decimal dec) {
+  return dec.toString();
+}
+
+Decimal decimalDeserializer(dynamic dec) {
+  if (dec.runtimeType == String) {
+    return Decimal.parse(dec as String);
+  }
+  throw ArgumentError('Type not valid for conversion !');
 }

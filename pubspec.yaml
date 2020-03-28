@@ -14,7 +14,7 @@ description: A new Flutter project.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.2.2 <3.0.0"
 
 dependencies:
   flutter:
@@ -26,6 +26,8 @@ dependencies:
   firebase_auth: ^0.14.0+5
   cloud_firestore: ^0.12.9+5
   json_annotation: ^3.0.1
+  uuid: ^2.0.4
+  decimal: ^0.3.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -54,6 +56,12 @@ flutter:
   assets:
     - assets/font/mango_drink.ttf
     - assets/animals/cat/
+    - assets/animals/chick/
+    - assets/animals/fox/
+    - assets/animals/mouse/
+    - assets/animals/pig/
+    - assets/animals/rabbit/
+    - assets/eggs/
     - assets/ui/
     - assets/emotions/
 

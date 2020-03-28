@@ -3,11 +3,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:uuid/uuid.dart';
 
 import '../common/common.dart';
 import '../repository/tama-repository.dart';
+import '../repository/user-tama-repository.dart';
 import '../pages/tamapage/tamapage.dart';
 import '../model/user-info.dart' as model;
+import '../model/tama.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -19,18 +22,28 @@ class AuthService {
         email: emailController.text.trim(), 
         password: passwordController.text.trim()
       );
-      model.UserInfo userInfo = await TamaRepository.findUser(result.user.uid);
+      model.UserInfo userInfo = await UserTamaRepository.findUser(result.user.uid);
       if (userInfo == null) {
         print("User is null");
         userInfo = model.UserInfo(result.user.uid, "");
-        TamaRepository.saveUser(userInfo);
+        UserTamaRepository.createUser(userInfo);
       } else {
-        print("Found $userInfo");
+        print('Found $userInfo');
+      }
+      Tama tama = await TamaRepository.findTamaById(userInfo.tamaId);
+      if (tama == null) {
+        tama = Tama.empty(Uuid().v4());
+        await TamaRepository.createTama(tama);
+        userInfo.tamaId = tama.tamaId;
+        await UserTamaRepository.saveUser(userInfo);
+      } else {
+        print('Found Tama : $tama');
       }
       saveUser(userInfo.toJson());
-      Navigator.push(
+      saveTama(tama.toJson());
+      Navigator.push<TamaPage>(
         currentContext,
-        MaterialPageRoute(builder: (context) => TamaPage()),
+        MaterialPageRoute<TamaPage>(builder: (context) => TamaPage()),
       );
     } catch (error) {
       print(error);
@@ -38,9 +51,10 @@ class AuthService {
     }
   }
 
-  static void _toggleError(BuildContext context, PlatformException error) {
-    String message = _decodeMessage(error);
-    Text text = Text(message, style: TextStyle(color: Colors.red));
+  static void _toggleError(BuildContext context, dynamic error) {
+    final String message = error.runtimeType == PlatformException ? 
+      _decodeMessage(error as PlatformException) : 'Errore Inaspettato';
+    final Text text = Text(message, style: TextStyle(color: Colors.red));
     // need to build
     Scaffold.of(context).showSnackBar(
       SnackBar(
@@ -83,9 +97,9 @@ class AuthService {
       AuthResult auth = await _auth.createUserWithEmailAndPassword(email: emailController.text, password: passwordController.text);
       model.UserInfo userInfo = model.UserInfo(auth.user.uid, "");
       saveUser(userInfo.toJson());
-      Navigator.push(
+      Navigator.push<TamaPage>(
         currentContext,
-        MaterialPageRoute(builder: (context) => TamaPage()),
+        MaterialPageRoute<TamaPage>(builder: (context) => TamaPage()),
       );
     } catch(error) {
       print(error);
