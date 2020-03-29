@@ -2,6 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'user-info.g.dart';
 
+// Define a UserInfo Entity
 @JsonSerializable()
 class UserInfo {
 

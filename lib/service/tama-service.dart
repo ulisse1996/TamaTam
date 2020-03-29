@@ -3,20 +3,27 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:decimal/decimal.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../common/common.dart' as common;
 import '../model/tama.dart';
 import '../repository/tama-repository.dart' as tama_repository;
 
+// Get Tama from Firebase Collection
 Future<Tama> getTama(String tamaId) {
   return tama_repository.findTamaById(tamaId);
 }
 
+// Save updated Tama in Firebase Collection
 Future<void> saveTama(Tama tama) {
   return tama_repository.saveTama(tama);
 }
 
+/// Decrease a random prop in Tama's props like food , happy , sleep
+/// and add event in the appropriate bloc
+/// If prop is less than 0 after decrease , bloc is not update and 
+/// instead life decrease 
 void decreaseProp(TamaLifeBloc lifeBloc, TamaFoodBloc foodBloc,
     TamaHappyBloc happyBloc, TamaSleepBloc sleepBloc) {
   final Decimal food = foodBloc.state;
@@ -25,16 +32,16 @@ void decreaseProp(TamaLifeBloc lifeBloc, TamaFoodBloc foodBloc,
     final Decimal life = lifeBloc.state;
     final Decimal dec = Decimal.parse('0.1');
 
-    //TODO check for value <= 0
-
     // Get random prop to decrease
     final int prop = Random().nextInt(3);
     switch (prop) {
       case 0:
         // Decrease Food
         final Decimal decFood = food - dec;
-        foodBloc.add(TamaFoodEvent(decFood));
-        if (decFood == Decimal.zero) {
+        if (decFood >= Decimal.zero) {
+          foodBloc.add(TamaFoodEvent(decFood));
+        }
+        if (decFood <= Decimal.zero) {
           // Remove life too
           lifeBloc.add(TamaLifeEvent(life - dec));
         }
@@ -42,7 +49,9 @@ void decreaseProp(TamaLifeBloc lifeBloc, TamaFoodBloc foodBloc,
       case 1:
         // Decrease Happy
         final Decimal decHappy = happy - dec;
-        happyBloc.add(TamaHappyEvent(decHappy));
+        if (decHappy >= Decimal.zero) {
+          happyBloc.add(TamaHappyEvent(decHappy));
+        }
         if (decHappy == Decimal.zero) {
           // Remove life too
           lifeBloc.add(TamaLifeEvent(life - dec));
@@ -51,7 +60,9 @@ void decreaseProp(TamaLifeBloc lifeBloc, TamaFoodBloc foodBloc,
       case 2:
         // Decrease Sleep
         final Decimal decSleep = sleep - dec;
-        sleepBloc.add(TamaSleepEvent(decSleep));
+        if (decSleep >= Decimal.zero) {
+          sleepBloc.add(TamaSleepEvent(decSleep));
+        }
         if (decSleep == Decimal.zero) {
           // Remove life too
           lifeBloc.add(TamaLifeEvent(life - dec));
@@ -60,6 +71,7 @@ void decreaseProp(TamaLifeBloc lifeBloc, TamaFoodBloc foodBloc,
     }
 }
 
+// Base class for any TamaEvent which update a Tama entity
 abstract class TamaEvent<T> {
   TamaEvent(this._val);
 
@@ -139,7 +151,7 @@ class TamaHappyBloc extends Bloc<TamaHappyEvent, Decimal> {
 }
 
 class TamaImageBloc extends Bloc<int, String> {
-  final List<String> _images = common.TamaUtil.getImages(Tama.fromJson(common.getTama()).tamaType);
+  final List<String> _images = getTamaImages(Tama.fromJson(common.getTama()).tamaType);
 
   @override
   String get initialState => _images[0];
@@ -161,7 +173,7 @@ enum EmotionType {
 }
 
 class TamaEmotionBloc extends Bloc<EmotionType, String> {
-  final Map<EmotionType,String> _emotions = common.TamaUtil.getEmotions();
+  final Map<EmotionType,String> _emotions = getEmotions();
 
   @override
   String get initialState => '';
@@ -171,4 +183,65 @@ class TamaEmotionBloc extends Bloc<EmotionType, String> {
     yield _emotions[event];
   }
 
+}
+
+String _append(String s, String s2) {
+  return s + s2;
+}
+
+List<String> getTamaImages(TamaType tamaType) {
+  final String name = describeEnum(tamaType).toLowerCase();
+  final String camel = _camelCase(describeEnum(tamaType));
+  return List<String>.of(<String>[
+    _append('assets/animals/$name/$camel','_Down.png'),
+    _append('assets/animals/$name/$camel','_Left.png'),
+    _append('assets/animals/$name/$camel','_Right.png'),
+    _append('assets/animals/$name/$camel','_Up.png')
+  ]);
+}
+
+String _camelCase(String s) {
+  final String sLow = s.toLowerCase();
+  return sLow[0].toUpperCase() + sLow.substring(1);
+}
+
+String getTamaDeadImage(TamaType tamaType) {
+  final String name = describeEnum(tamaType).toLowerCase();
+  final String camel = _camelCase(describeEnum(tamaType));
+  return _append('assets/animals/$name/$camel','_Dead.png');
+}
+
+String getAvatar(TamaType tamaType) {
+  final String name = describeEnum(tamaType).toLowerCase();
+  final String camel = _camelCase(describeEnum(tamaType));
+  return _append('assets/animals/$name/$camel','_Avatar_Circle.png');
+}
+
+String getEggImage(TamaType tamaType) {
+  switch (tamaType) {
+    case TamaType.CAT:
+      return 'assets/eggs/egg_blue';
+    case TamaType.CHICK:
+      return 'assets/eggs/egg_yellow';
+    case TamaType.PIG:
+    case TamaType.RABBIT:
+      return 'assets/eggs/egg_pink';
+    case TamaType.FOX:
+    case TamaType.MOUSE:
+      return 'assets/eggs/egg_red';
+  }
+  return ''; //Never Happen
+}
+
+Map<EmotionType, String> getEmotions() {
+  final Map<EmotionType,String> vals = <EmotionType,String>{};
+  for (final EmotionType em in EmotionType.values) {
+    final String camel = _camelCase(describeEnum(em));
+    vals[em] = 'assets/emotions/Status_$camel.png';
+  }
+  return vals;
+}
+
+int getTamaImagesSize() {
+  return 4;
 }

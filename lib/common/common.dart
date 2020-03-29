@@ -1,15 +1,12 @@
 import 'dart:math' as math;
 
 import 'package:decimal/decimal.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import '../main.dart';
-import '../model/tama.dart';
-import '../service/tama-service.dart';
 
 const String USER_INFO = 'userInfo';
 const String TAMA = 'tama';
@@ -20,15 +17,7 @@ const String EMAIL_REGEX =
     r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
 final LocalStorage _localStorage = LocalStorage(DATA_FILE);
 
-class LoadingStateView extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: Text('Loaind')),
-    );
-  }
-}
-
+// Base page of all pages in the app
 abstract class BasePageWidget extends StatelessWidget {
   final Padding _title = const Padding(
       padding: EdgeInsets.only(top: 10),
@@ -77,6 +66,7 @@ abstract class BasePageWidget extends StatelessWidget {
   }
 }
 
+// Validate password field in HomePage widget
 String passwordValidator(String value, String title) {
   if (value == null || value.isEmpty) {
     return "$title can't be empty!";
@@ -85,6 +75,7 @@ String passwordValidator(String value, String title) {
   return null;
 }
 
+// Validate email field in Homepage widget
 String emailValidator(String value, String title) {
   if (value == null || value.isEmpty) {
     return "$title can't be empty!";
@@ -96,29 +87,35 @@ String emailValidator(String value, String title) {
   return null;
 }
 
+// Check if current user is logged
 bool checkLogged() {
   final Map<String, dynamic> values = getUserInfo();
   return values != null && values.isNotEmpty;
 }
 
+// Save user info in a local storage as a json
 Future<void> saveUser(Map<String, dynamic> info) async {
   _localStorage.setItem(USER_INFO, info);
 }
 
+// Save tama info in a local storage as a json
 Future<void> saveTama(Map<String, dynamic> info) async {
   _localStorage.setItem(TAMA, info);
 }
 
+// Get current Tama
 Map<String, dynamic> getTama() {
   final Map<String, dynamic> values = _localStorage.getItem(TAMA) as Map<String, dynamic>;
   return values;
 }
 
+// Get current user info
 Map<String, dynamic> getUserInfo() {
   final Map<String, dynamic> values = _localStorage.getItem(USER_INFO) as Map<String, dynamic>;
   return values;
 }
 
+// Util Loading Widget for display a loading screen
 class LoadingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -134,78 +131,16 @@ class LoadingScreen extends StatelessWidget {
   }
 }
 
+// Push a new LoadingScreen in current Navigator
 void showLoading(BuildContext context) {
   final LoadingScreen screen = LoadingScreen();
   Navigator.of(context).push<LoadingScreen>
     (MaterialPageRoute<LoadingScreen>(builder: (BuildContext context) => screen));
 }
 
+// Remove pushed Loading Screen
 void removeLoading<T>(BuildContext context, T obj) {
   Navigator.of(context).pop(obj);
-}
-
-class TamaUtil {
-
-  static String _append(String s, String s2) {
-    return s + s2;
-  }
-
-  static List<String> getImages(TamaType tamaType) {
-    final String name = describeEnum(tamaType).toLowerCase();
-    final String camel = _camelCase(describeEnum(tamaType));
-    return List<String>.of(<String>[
-      _append('assets/animals/$name/$camel','_Down.png'),
-      _append('assets/animals/$name/$camel','_Left.png'),
-      _append('assets/animals/$name/$camel','_Right.png'),
-      _append('assets/animals/$name/$camel','_Up.png')
-    ]);
-  }
-
-  static String _camelCase(String s) {
-    final String sLow = s.toLowerCase();
-    return sLow[0].toUpperCase() + sLow.substring(1);
-  }
-
-  static String getDeadImage(TamaType tamaType) {
-    final String name = describeEnum(tamaType).toLowerCase();
-    final String camel = _camelCase(describeEnum(tamaType));
-    return _append('assets/animals/$name/$camel','_Dead.png');
-  }
-
-  static String getAvatar(TamaType tamaType) {
-    final String name = describeEnum(tamaType).toLowerCase();
-    final String camel = _camelCase(describeEnum(tamaType));
-    return _append('assets/animals/$name/$camel','_Avatar_Circle.png');
-  }
-
-  static String getEggImage(TamaType tamaType) {
-    switch (tamaType) {
-      case TamaType.CAT:
-        return 'assets/eggs/egg_blue';
-      case TamaType.CHICK:
-        return 'assets/eggs/egg_yellow';
-      case TamaType.PIG:
-      case TamaType.RABBIT:
-        return 'assets/eggs/egg_pink';
-      case TamaType.FOX:
-      case TamaType.MOUSE:
-        return 'assets/eggs/egg_red';
-    }
-    return ''; //Never Happen
-  }
-
-  static Map<EmotionType, String> getEmotions() {
-    final Map<EmotionType,String> vals = <EmotionType,String>{};
-    for (final EmotionType em in EmotionType.values) {
-      final String camel = _camelCase(describeEnum(em));
-      vals[em] = 'assets/emotions/Status_$camel.png';
-    }
-    return vals;
-  }
-
-  static int getImagesSize() {
-    return 4;
-  }
 }
 
 String decimalSerializer(Decimal dec) {

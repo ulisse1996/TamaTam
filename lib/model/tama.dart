@@ -7,6 +7,7 @@ import '../common/common.dart';
 
 part 'tama.g.dart';
 
+/// Define a tama Type
 enum TamaType {
   CAT,
   CHICK,
@@ -16,6 +17,7 @@ enum TamaType {
   RABBIT
 }
 
+// Define a Tama entity
 @JsonSerializable()
 class Tama {
 

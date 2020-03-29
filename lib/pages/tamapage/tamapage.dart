@@ -259,8 +259,8 @@ class _TamaPageBodyState extends State<_TamaPageBody> {
       final String currImage = imageBloc.state;
       String nextImage = currImage;
       while (true) {
-        final int next = Random().nextInt(TamaUtil.getImagesSize());
-        nextImage = TamaUtil.getImages(Tama.fromJson(getTama()).tamaType)[next];
+        final int next = Random().nextInt(tama_service.getTamaImagesSize());
+        nextImage = tama_service.getTamaImages(Tama.fromJson(getTama()).tamaType)[next];
         if (nextImage != currImage) {
           imageBloc.add(next);
           break;
