@@ -24,22 +24,30 @@ class AuthService {
       model.UserInfo userInfo = await user_repository.findUser(result.user.uid);
       if (userInfo == null) {
         print('User is null');
-        userInfo = model.UserInfo(result.user.uid, '');
+        userInfo = model.UserInfo(result.user.uid, '', DateTime.now());
         await user_repository.createUser(userInfo);
       } else {
-        print('Found $userInfo');
+        print('Found ${userInfo.toString()}');
+
+        // Update login dateTime
+        userInfo.lastLogin = DateTime.now();
+        await user_repository.saveUser(userInfo);
       }
       Tama tama = await tama_repository.findTamaById(userInfo.tamaId);
       if (tama == null) {
+        print('Tama is null');
         tama = Tama.empty(Uuid().v4());
         await tama_repository.createTama(tama);
         userInfo.tamaId = tama.tamaId;
         await user_repository.saveUser(userInfo);
       } else {
-        print('Found Tama : $tama');
+        print('Found Tama : ${tama.toString()}');
       }
+
+      // Save info and Tama in localstorage
       await saveUser(userInfo.toJson());
       await saveTama(tama.toJson());
+
       Navigator.push<TamaPage>(
         currentContext,
         MaterialPageRoute<TamaPage>(builder: (BuildContext context) => TamaPage()),
@@ -94,7 +102,7 @@ class AuthService {
   static Future<void> processRegister(BuildContext currentContext, TextEditingController emailController, TextEditingController passwordController) async {
     try {
       final AuthResult auth = await _auth.createUserWithEmailAndPassword(email: emailController.text, password: passwordController.text);
-      final model.UserInfo userInfo = model.UserInfo(auth.user.uid, '');
+      final model.UserInfo userInfo = model.UserInfo(auth.user.uid, '', DateTime.now());
       saveUser(userInfo.toJson());
       Navigator.push<TamaPage>(
         currentContext,

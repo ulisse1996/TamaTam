@@ -19,7 +19,7 @@ enum TamaType {
 
 // Define a Tama entity
 @JsonSerializable()
-class Tama {
+class Tama extends BaseModel {
 
   Tama(this.tamaId, this.tamaType, 
     this.life, this.food, this.happy, this.sleep,
@@ -46,6 +46,7 @@ class Tama {
   Decimal sleep;
   DateTime lifeTime;
 
+  @override
   Map<String, dynamic> toJson() => _$TamaToJson(this);
 
 }

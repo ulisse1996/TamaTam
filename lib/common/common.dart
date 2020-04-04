@@ -153,3 +153,17 @@ Decimal decimalDeserializer(dynamic dec) {
   }
   throw ArgumentError('Type not valid for conversion !');
 }
+
+abstract class BaseModel {
+
+  Map<String, dynamic> toJson();
+
+  @override
+  String toString() {
+    return toJson().toString();
+  }
+}
+
+Duration differenceFromNow(DateTime date) {
+  return DateTime.now().difference(date);
+}

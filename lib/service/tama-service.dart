@@ -5,6 +5,9 @@ import 'dart:math';
 import 'package:decimal/decimal.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tamatama/model/user-info.dart';
+import 'package:tamatama/repository/user-tama-repository.dart';
+import 'package:uuid/uuid.dart';
 
 import '../common/common.dart' as common;
 import '../model/tama.dart';
@@ -24,9 +27,9 @@ Future<void> saveTama(Tama tama) {
 /// and add event in the appropriate bloc
 /// If prop is less than 0 after decrease , bloc is not update and 
 /// instead life decrease 
-void decreaseProp(TamaLifeBloc lifeBloc, TamaFoodBloc foodBloc,
+Decimal decreaseProp(TamaLifeBloc lifeBloc, TamaFoodBloc foodBloc,
     TamaHappyBloc happyBloc, TamaSleepBloc sleepBloc) {
-  final Decimal food = foodBloc.state;
+    final Decimal food = foodBloc.state;
     final Decimal happy = happyBloc.state;
     final Decimal sleep = sleepBloc.state;
     final Decimal life = lifeBloc.state;
@@ -40,10 +43,10 @@ void decreaseProp(TamaLifeBloc lifeBloc, TamaFoodBloc foodBloc,
         final Decimal decFood = food - dec;
         if (decFood >= Decimal.zero) {
           foodBloc.add(TamaFoodEvent(decFood));
-        }
-        if (decFood <= Decimal.zero) {
-          // Remove life too
+        } else {
+          // Remove life 
           lifeBloc.add(TamaLifeEvent(life - dec));
+          return life - dec;
         }
         break;
       case 1:
@@ -51,10 +54,10 @@ void decreaseProp(TamaLifeBloc lifeBloc, TamaFoodBloc foodBloc,
         final Decimal decHappy = happy - dec;
         if (decHappy >= Decimal.zero) {
           happyBloc.add(TamaHappyEvent(decHappy));
-        }
-        if (decHappy == Decimal.zero) {
-          // Remove life too
+        } else {
+          // Remove life
           lifeBloc.add(TamaLifeEvent(life - dec));
+          return life - dec;
         }
         break;
       case 2:
@@ -62,13 +65,14 @@ void decreaseProp(TamaLifeBloc lifeBloc, TamaFoodBloc foodBloc,
         final Decimal decSleep = sleep - dec;
         if (decSleep >= Decimal.zero) {
           sleepBloc.add(TamaSleepEvent(decSleep));
-        }
-        if (decSleep == Decimal.zero) {
-          // Remove life too
+        } else {
+          // Remove life 
           lifeBloc.add(TamaLifeEvent(life - dec));
+          return life - dec;
         }
         break;
     }
+    return life;
 }
 
 // Base class for any TamaEvent which update a Tama entity
@@ -97,7 +101,7 @@ class TamaLifeBloc extends Bloc<TamaLifeEvent, Decimal> {
     yield event._val;
     tama.life = event._val;
     await saveTama(tama);
-    common.saveTama(tama.toJson());
+    await common.saveTama(tama.toJson());
   }
 
 }
@@ -113,7 +117,7 @@ class TamaSleepBloc extends Bloc<TamaSleepEvent, Decimal> {
     yield event._val;
     tama.sleep = event._val;
     await saveTama(tama);
-    common.saveTama(tama.toJson());
+    await common.saveTama(tama.toJson());
   }
 
 }
@@ -129,7 +133,7 @@ class TamaFoodBloc extends Bloc<TamaFoodEvent, Decimal> {
     yield event._val;
     tama.food = event._val;
     await saveTama(tama);
-    common.saveTama(tama.toJson());
+    await common.saveTama(tama.toJson());
   }
 
 }
@@ -145,7 +149,7 @@ class TamaHappyBloc extends Bloc<TamaHappyEvent, Decimal> {
     yield event._val;
     tama.happy = event._val;
     await saveTama(tama);
-    common.saveTama(tama.toJson());
+    await common.saveTama(tama.toJson());
   }
 
 }
@@ -185,6 +189,23 @@ class TamaEmotionBloc extends Bloc<EmotionType, String> {
 
 }
 
+enum TamaEggEvent {
+  REMOVE_TIME
+}
+
+class TamaEggBloc extends Bloc<TamaEggEvent, int> {
+
+  @override
+  int get initialState => 120000;
+
+  @override
+  Stream<int> mapEventToState(TamaEggEvent event) async* {
+    if (event == TamaEggEvent.REMOVE_TIME) {
+      yield state - 1000;
+    }
+  }
+}
+
 String _append(String s, String s2) {
   return s + s2;
 }
@@ -220,15 +241,15 @@ String getAvatar(TamaType tamaType) {
 String getEggImage(TamaType tamaType) {
   switch (tamaType) {
     case TamaType.CAT:
-      return 'assets/eggs/egg_blue';
+      return 'assets/eggs/egg_blue.png';
     case TamaType.CHICK:
-      return 'assets/eggs/egg_yellow';
+      return 'assets/eggs/egg_yellow.png';
     case TamaType.PIG:
     case TamaType.RABBIT:
-      return 'assets/eggs/egg_pink';
+      return 'assets/eggs/egg_pink.png';
     case TamaType.FOX:
     case TamaType.MOUSE:
-      return 'assets/eggs/egg_red';
+      return 'assets/eggs/egg_red.png';
   }
   return ''; //Never Happen
 }
@@ -244,4 +265,16 @@ Map<EmotionType, String> getEmotions() {
 
 int getTamaImagesSize() {
   return 4;
+}
+
+Future<void> createNewTama() async {
+  final UserInfo userInfo = UserInfo.fromJson(common.getUserInfo());
+  final Tama tama = Tama.empty(Uuid().v4());
+  await tama_repository.createTama(tama);
+  userInfo.tamaId = tama.tamaId;
+  await saveUser(userInfo);
+
+  // Save in local
+  await common.saveTama(tama.toJson());
+  await common.saveUser(userInfo.toJson());
 }
