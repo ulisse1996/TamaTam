@@ -26,12 +26,12 @@ class AuthService {
         print('User is null');
         userInfo = model.UserInfo(result.user.uid, '', DateTime.now());
         await user_repository.createUser(userInfo);
+        await saveLastLogin(userInfo.lastLogin);
       } else {
         print('Found ${userInfo.toString()}');
 
-        // Update login dateTime
-        userInfo.lastLogin = DateTime.now();
-        await user_repository.saveUser(userInfo);
+        // Save LastLogin
+        await saveLastLogin(userInfo.lastLogin);
       }
       Tama tama = await tama_repository.findTamaById(userInfo.tamaId);
       if (tama == null) {
@@ -113,4 +113,8 @@ class AuthService {
       _toggleError(currentContext, error);
     }
   }
+}
+
+Future<void> updateUser(model.UserInfo userInfo) async {
+  await user_repository.saveUser(userInfo);
 }

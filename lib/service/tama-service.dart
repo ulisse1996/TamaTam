@@ -12,6 +12,7 @@ import 'package:uuid/uuid.dart';
 import '../common/common.dart' as common;
 import '../model/tama.dart';
 import '../repository/tama-repository.dart' as tama_repository;
+import '../service/auth-service.dart' as auth_service;
 
 // Get Tama from Firebase Collection
 Future<Tama> getTama(String tamaId) {
@@ -155,13 +156,18 @@ class TamaHappyBloc extends Bloc<TamaHappyEvent, Decimal> {
 }
 
 class TamaImageBloc extends Bloc<int, String> {
-  final List<String> _images = getTamaImages(Tama.fromJson(common.getTama()).tamaType);
+  List<String> _images = getTamaImages(Tama.fromJson(common.getTama()).tamaType);
 
   @override
   String get initialState => _images[0];
 
   @override
   Stream<String> mapEventToState(int event) async* {
+    if (event == -1) {
+      // Reset for dead event
+      _images = getTamaImages(Tama.fromJson(common.getTama()).tamaType);
+      event = 0;
+    }
     yield _images[event];
   }
 
@@ -277,4 +283,73 @@ Future<void> createNewTama() async {
   // Save in local
   await common.saveTama(tama.toJson());
   await common.saveUser(userInfo.toJson());
+}
+
+void resetTama(
+    TamaLifeBloc lifeBloc,
+    TamaFoodBloc foodBloc,
+    TamaHappyBloc happyBloc,
+    TamaSleepBloc sleepBloc,
+    TamaImageBloc imageBloc
+) {
+    final Tama tama = Tama.fromJson(common.getTama());
+    lifeBloc.add(TamaLifeEvent(tama.life));
+    foodBloc.add(TamaFoodEvent(tama.food));
+    happyBloc.add(TamaHappyEvent(tama.happy));
+    sleepBloc.add(TamaSleepEvent(tama.sleep));
+    imageBloc.add(-1); // Reset images
+}
+
+Future<void> descPropFromLastLogin(
+  Duration propDecDuration
+) async {
+  final Tama tama = Tama.fromJson(common.getTama());
+  final DateTime dateTime = common.getLastLogin();
+  final Duration difference = common.differenceFromNow(dateTime);
+  print('Found ${difference.inMinutes} minutes difference from last login');
+  // Get num of time of decProp
+  final Decimal diffMin = Decimal.fromInt(difference.inMinutes);
+  final Decimal duration = Decimal.fromInt(propDecDuration.inMinutes);
+  final int numCall = (diffMin / duration).toInt();
+  final Decimal dec = Decimal.parse('0.1');
+  print('Calling descreaseProp for $numCall');
+  int i = 0;
+  while (i <= numCall) {
+    final int prop = Random().nextInt(3);
+    switch (prop) {
+      case 0:
+        final Decimal decFood = tama.food - dec;
+        if (decFood <= Decimal.zero) {
+          tama.life = tama.life - dec;
+        } else {
+          tama.food = tama.food - dec;
+        }
+        break;
+      case 1:
+        final Decimal decHappy = tama.happy - dec;
+        if (decHappy <= Decimal.zero) {
+          tama.life = tama.life - dec;
+        } else {
+          tama.happy = tama.happy - dec;
+        }
+        break;
+      case 2:
+        final Decimal decSleep = tama.sleep - dec;
+        if (decSleep <= Decimal.zero) {
+          tama.life = tama.life - dec;
+        } else {
+          tama.sleep = tama.sleep - dec;
+        }
+        break;
+    }
+    i++;
+  }
+  await saveTama(tama);
+  await common.saveTama(tama.toJson());
+}
+
+Future<void> saveLastLogin() async {
+  final UserInfo userInfo = UserInfo.fromJson(common.getUserInfo());
+  userInfo.lastLogin = DateTime.now();
+  await auth_service.updateUser(userInfo);
 }

@@ -10,6 +10,7 @@ import '../main.dart';
 
 const String USER_INFO = 'userInfo';
 const String TAMA = 'tama';
+const String LAST_LOGIN = 'lastLogin';
 const String DATA_FILE = 'dataUser.json';
 const String PASSWORD = 'Password';
 const String EMAIL = 'Email';
@@ -103,6 +104,17 @@ Future<void> saveTama(Map<String, dynamic> info) async {
   _localStorage.setItem(TAMA, info);
 }
 
+Future<void> saveLastLogin(DateTime time) async {
+  _localStorage.setItem(LAST_LOGIN, time, encodeableDateTime);
+}
+
+Object encodeableDateTime(Object obj) {
+  if(obj is DateTime) {
+    return obj.toIso8601String();
+  }
+  return obj;
+}
+
 // Get current Tama
 Map<String, dynamic> getTama() {
   final Map<String, dynamic> values = _localStorage.getItem(TAMA) as Map<String, dynamic>;
@@ -113,6 +125,11 @@ Map<String, dynamic> getTama() {
 Map<String, dynamic> getUserInfo() {
   final Map<String, dynamic> values = _localStorage.getItem(USER_INFO) as Map<String, dynamic>;
   return values;
+}
+
+DateTime getLastLogin() {
+  final String time = _localStorage.getItem(LAST_LOGIN) as String;
+  return DateTime.tryParse(time);
 }
 
 // Util Loading Widget for display a loading screen

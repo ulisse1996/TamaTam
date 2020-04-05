@@ -47,10 +47,12 @@ class _TamaPageBody extends StatefulWidget {
   State createState() => _TamaPageBodyState();
 }
 
-class _TamaPageBodyState extends State<_TamaPageBody> {
+class _TamaPageBodyState extends State<_TamaPageBody>
+    with WidgetsBindingObserver {
   Timer _imageTimer;
   Timer _tamaTimer;
   Timer _eggTimer;
+  final Duration _propDuration = const Duration(minutes: 40);
 
   @override
   Widget build(BuildContext context) {
@@ -69,13 +71,22 @@ class _TamaPageBodyState extends State<_TamaPageBody> {
     final tama_service.TamaEggBloc eggBloc =
         BlocProvider.of<tama_service.TamaEggBloc>(context);
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        ...buildPage(lifeBloc, foodBloc, happyBloc, sleepBloc, imageBloc,
-            emotionBloc, eggBloc)
-      ],
-    );
+    return FutureBuilder<void>(
+        builder: (BuildContext context, AsyncSnapshot<void> snap) {
+          if (snap.connectionState != ConnectionState.done) {
+            print('Not ready , show loading screen');
+            return LoadingScreen();
+          } else {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                ...buildPage(lifeBloc, foodBloc, happyBloc, sleepBloc,
+                    imageBloc, emotionBloc, eggBloc)
+              ],
+            );
+          }
+        },
+        future: doPropReduce());
   }
 
   Padding buildTama(tama_service.TamaImageBloc imageBloc,
@@ -108,12 +119,33 @@ class _TamaPageBodyState extends State<_TamaPageBody> {
   }
 
   @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (AppLifecycleState.inactive == state) {
+      print('Inacative');
+      await tama_service.saveLastLogin();
+    }
+  }
+
+  Future<void> doPropReduce() {
+    if (!isEggTime() && !isDead()) {
+      return tama_service.descPropFromLastLogin(_propDuration);
+    }
+    return Future<void>.value(null);
+  }
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addObserver(this);
+    super.initState();
+  }
+
+  @override
   void dispose() {
     print('Calling dispose for kill timers');
     _tamaTimer?.cancel();
     _imageTimer?.cancel();
     _eggTimer?.cancel();
-
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -281,8 +313,9 @@ class _TamaPageBodyState extends State<_TamaPageBody> {
       tama_service.TamaFoodBloc foodBloc,
       tama_service.TamaHappyBloc happyBloc,
       tama_service.TamaSleepBloc sleepBloc) {
-    _tamaTimer = Timer.periodic(const Duration(seconds: 30), (Timer t) {
-      final Decimal life = tama_service.decreaseProp(lifeBloc, foodBloc, happyBloc, sleepBloc);
+    _tamaTimer = Timer.periodic(_propDuration, (Timer t) {
+      final Decimal life =
+          tama_service.decreaseProp(lifeBloc, foodBloc, happyBloc, sleepBloc);
       if (life <= Decimal.zero) {
         setState(() {
           _tamaTimer?.cancel();
@@ -313,7 +346,7 @@ class _TamaPageBodyState extends State<_TamaPageBody> {
       return <Widget>[buildEgg(), ...buildEggTimer(eggBloc)];
     } else if (isDead()) {
       return <Widget>[
-        ...buildDeadTama()
+        ...buildDeadTama(lifeBloc, foodBloc, happyBloc, sleepBloc, imageBloc)
       ];
     } else {
       return <Widget>[
@@ -335,12 +368,17 @@ class _TamaPageBodyState extends State<_TamaPageBody> {
     return diff.inMinutes < 2;
   }
 
-  List<Widget> buildDeadTama() {
+  List<Widget> buildDeadTama(
+      tama_service.TamaLifeBloc lifeBloc,
+      tama_service.TamaFoodBloc foodBloc,
+      tama_service.TamaHappyBloc happyBloc,
+      tama_service.TamaSleepBloc sleepBloc,
+      tama_service.TamaImageBloc imageBloc) {
     final Tama tama = Tama.fromJson(getTama());
     return <Widget>[
       Center(
-        child:
-            Image(image: AssetImage(tama_service.getTamaDeadImage(tama.tamaType)))),
+          child: Image(
+              image: AssetImage(tama_service.getTamaDeadImage(tama.tamaType)))),
       const Padding(
           padding: EdgeInsets.only(bottom: 20, top: 40),
           child: Center(
@@ -349,16 +387,15 @@ class _TamaPageBodyState extends State<_TamaPageBody> {
             style: TextStyle(fontFamily: 'Mango Drink', fontSize: 60),
           ))),
       RaisedButton(
-        child: 
-          const Text('Create new Tama')
-        ,
-        onPressed: () async {
-          await tama_service.createNewTama();
-          setState(() {
-            // Reload state
-          });
-        }
-      )
+          child: const Text('Create new Tama'),
+          onPressed: () async {
+            await tama_service.createNewTama();
+            setState(() {
+              // Reload new Tama
+              tama_service.resetTama(
+                  lifeBloc, foodBloc, happyBloc, sleepBloc, imageBloc);
+            });
+          })
     ];
   }
 
